@@ -42,7 +42,7 @@
  */
 
 /* Includes ---------------------------------------------------------------- */
-#include <YesNo_inferencing.h>
+#include <XIAO-ESP32-KWS_inferencing.h>
 
 #include <ESP_I2S.h>
 I2SClass I2S;
@@ -84,9 +84,9 @@ void setup()
     I2S.setPinsPdmRx(42, 41);
     if (!I2S.begin(I2S_MODE_PDM_RX, 16000, I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO)) {
       Serial.println("Failed to initialize I2S!");
-      while (1) ;
-    }
-
+    while (1) ;
+  }
+    
     // summary of inferencing settings (from model_metadata.h)
     ei_printf("Inferencing settings:\n");
     ei_printf("\tInterval: ");
@@ -145,9 +145,8 @@ void loop()
         if (result.classification[ix].value > pred_value){
            pred_index = ix;
            pred_value = result.classification[ix].value;
-        }
+      }
     }
-
     // Display inference result
     if (pred_index == 3){
       digitalWrite(LED_BUILT_IN, LOW); //Turn on
@@ -156,6 +155,7 @@ void loop()
       digitalWrite(LED_BUILT_IN, HIGH); //Turn off
     }
 
+    
 #if EI_CLASSIFIER_HAS_ANOMALY == 1
     ei_printf("    anomaly score: ");
     ei_printf_float(result.anomaly);
@@ -182,7 +182,7 @@ static void capture_samples(void* arg) {
 
   while (record_status) {
 
-    /* read data at once from i2s */
+    /* read data at once from i2s - Modified for XIAO ESP2S3 Sense and I2S.h library */
     // i2s_read((i2s_port_t)1, (void*)sampleBuffer, i2s_bytes_to_read, &bytes_read, 100);
     // esp_i2s::i2s_read(esp_i2s::I2S_NUM_0, (void*)sampleBuffer, i2s_bytes_to_read, &bytes_read, 100);
     bytes_read = I2S.readBytes((char*)sampleBuffer, 100);
@@ -230,9 +230,9 @@ static bool microphone_inference_start(uint32_t n_samples)
     inference.n_samples  = n_samples;
     inference.buf_ready  = 0;
 
-    // if (i2s_init(EI_CLASSIFIER_FREQUENCY)) {
-    //     ei_printf("Failed to start I2S!");
-    // }
+//    if (i2s_init(EI_CLASSIFIER_FREQUENCY)) {
+//        ei_printf("Failed to start I2S!");
+//    }
 
     ei_sleep(100);
 
